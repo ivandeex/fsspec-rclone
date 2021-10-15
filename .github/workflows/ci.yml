@@ -1,0 +1,32 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9"]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        shell: bash
+        run: |
+          pip install -y pytest flake8 black fsspec
+      - name: Install self
+        shell: bash
+        run: python setup.py install
+      - name: Run Tests
+        shell: bash
+        run: pytest -v fsspec_rclone
+      - name: Lint
+        shell: bash
+        run: |
+          flake8 fsspec_rclone
+          black fsspec_rclone --check
