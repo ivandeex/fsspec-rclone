@@ -1,3 +1,4 @@
+---
 name: CI
 
 on: [push, pull_request]
@@ -9,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9"]
+        python-version: ["3.7", "3.8", "3.9"]
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
@@ -18,11 +19,15 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
-          pip install -y pytest flake8 black fsspec
-      - name: Install self
+          pip install pytest flake8 black fsspec
+          pip install setuptools wheel twine
+          pip install fsspec
+      - name: Install Rclone
         shell: bash
-        run: python setup.py install
-      - name: Run Tests
+        run: |
+          wget -nv https://downloads.rclone.org/rclone-current-linux-amd64.deb
+          sudo dpkg -i rclone-current-linux-amd64.deb
+      - name: Run tests
         shell: bash
         run: pytest -v fsspec_rclone
       - name: Lint
@@ -30,3 +35,16 @@ jobs:
         run: |
           flake8 fsspec_rclone
           black fsspec_rclone --check
+      - name: Build package
+        shell: bash
+        run: |
+          python setup.py sdist bdist_wheel
+      - name: Publish package
+        if: startsWith(github.ref, 'refs/tags/v') && matrix.python-version == '3.7'
+        shell: bash
+        run: |
+          twine upload dist/*
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+...

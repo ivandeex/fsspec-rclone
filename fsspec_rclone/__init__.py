@@ -1,7 +1,10 @@
 from .spec import RcloneSpecFS, RcloneSpecFile
 from fsspec import register_implementation
 
-__version__ = "0.0.1"
+from ._version import get_versions
+
+__version__ = get_versions()["version"]
+del get_versions
 
 register_implementation(RcloneSpecFS.protocol, RcloneSpecFS)
 

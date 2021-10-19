@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+import setuptools
+import versioneer
 
 with open("README.md", "r") as f:
     long_description = f.read()
 
-setup(
+setuptools.setup(
     name="fsspec-rclone",
-    version="0.0.1",
-    cmdclass="main",
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
@@ -20,6 +21,7 @@ setup(
     ],
     description="Filesystem-spec interface over rclone",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/ivandeex/fsspec-rclone/",
     author="Ivan Andreev",
     author_email="ivandeex@gmail.com",
